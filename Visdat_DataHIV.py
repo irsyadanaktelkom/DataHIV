@@ -7,9 +7,6 @@ from bokeh.layouts import column
 # Load the HIV dataset
 hiv_data = pd.read_csv('hiv.csv')
 
-# Set up the data source
-source = ColumnDataSource(hiv_data)
-
 # Create the figure
 p = figure(plot_width=400, plot_height=400, x_axis_label='Jumlah Kasus', y_axis_label='Kelompok Umur')
 
@@ -20,7 +17,7 @@ p.add_tools(hover)
 # Create the scatter plot glyphs for each gender
 gender_glyphs = {}
 for gender in hiv_data['jenis_kelamin'].unique():
-    gender_glyphs[gender] = p.circle('jumlah_kasus', 'kelompok_umur', source=source, size=8, color='red', alpha=0.5)
+    gender_glyphs[gender] = p.circle('jumlah_kasus', 'kelompok_umur', source=None, size=8, color='red', alpha=0.5)
 
 # Create the select widget
 gender_list = ['All'] + list(hiv_data['jenis_kelamin'].unique())
@@ -34,6 +31,10 @@ def update_plot():
     selected_data = hiv_data[(hiv_data['jenis_kelamin'] == select_gender) | (select_gender == 'All') & (hiv_data['tahun'] == slider)]
     source.data = ColumnDataSource(selected_data).data
 
+# Initialize the data source
+source = ColumnDataSource(data=dict(jumlah_kasus=[], kelompok_umur=[], nama_kabupaten_kota=[], jenis_kelamin=[], tahun=[]))
+
+# Update the plot initially
 update_plot()
 
 # Update the glyph fill alpha based on the selected gender
@@ -44,10 +45,13 @@ def update_glyphs():
         else:
             glyph.glyph.fill_alpha = 0
 
-update_glyphs()
-
 # Create the layout
 layout = column(p)
 
 # Display the plot and layout
 st.bokeh_chart(layout)
+
+# Run the update functions when the select box or slider values change
+if select_gender is not None and slider is not None:
+    update_plot()
+    update_glyphs()
