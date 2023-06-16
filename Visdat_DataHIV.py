@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import streamlit as st
 import pandas as pd
 from bokeh.plotting import figure
@@ -37,7 +31,7 @@ slider = st.slider('Tahun', min_value=min(hiv_data['tahun']), max_value=max(hiv_
 
 # Update the plot based on the selected gender and year
 selected_data = hiv_data[(hiv_data['jenis_kelamin'] == select_gender) | (select_gender == 'All') & (hiv_data['tahun'] == slider)]
-source.data = ColumnDataSource(selected_data).data
+source.data.update(ColumnDataSource(selected_data).data)
 
 # Update the glyph fill alpha based on the selected gender
 for gender, glyph in gender_glyphs.items():
@@ -51,10 +45,3 @@ layout = column(p)
 
 # Display the plot and layout
 st.bokeh_chart(layout)
-
-
-# In[ ]:
-
-
-
-
