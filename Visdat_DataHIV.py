@@ -30,15 +30,21 @@ select_gender = st.selectbox('Jenis Kelamin', options=gender_list)
 slider = st.slider('Tahun', min_value=min(hiv_data['tahun']), max_value=max(hiv_data['tahun']), value=min(hiv_data['tahun']), step=1)
 
 # Update the plot based on the selected gender and year
-selected_data = hiv_data[(hiv_data['jenis_kelamin'] == select_gender) | (select_gender == 'All') & (hiv_data['tahun'] == slider)]
-source.data.update(ColumnDataSource(selected_data).data)
+def update_plot():
+    selected_data = hiv_data[(hiv_data['jenis_kelamin'] == select_gender) | (select_gender == 'All') & (hiv_data['tahun'] == slider)]
+    source.data = ColumnDataSource(selected_data).data
+
+update_plot()
 
 # Update the glyph fill alpha based on the selected gender
-for gender, glyph in gender_glyphs.items():
-    if select_gender == 'All' or gender == select_gender:
-        glyph.glyph.fill_alpha = 0.5
-    else:
-        glyph.glyph.fill_alpha = 0
+def update_glyphs():
+    for gender, glyph in gender_glyphs.items():
+        if select_gender == 'All' or gender == select_gender:
+            glyph.glyph.fill_alpha = 0.5
+        else:
+            glyph.glyph.fill_alpha = 0
+
+update_glyphs()
 
 # Create the layout
 layout = column(p)
